@@ -70,7 +70,7 @@ describe('preview highlight', () => {
     document.body.appendChild(previewEl);
 
     eventEmitter = new EventEmitter();
-    editor = new MarkdownEditor(new ToastMark(), eventEmitter);
+    editor = new MarkdownEditor(new ToastMark(), eventEmitter, true);
     preview = new MarkdownPreview(eventEmitter, options);
   }
 

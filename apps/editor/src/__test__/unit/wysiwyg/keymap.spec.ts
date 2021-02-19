@@ -33,7 +33,7 @@ describe('keymap', () => {
     const adaptor = new WwToDOMAdaptor({}, {});
 
     em = new EventEmitter();
-    wwe = new WysiwygEditor(em, adaptor);
+    wwe = new WysiwygEditor(em, adaptor, true);
   });
 
   afterEach(() => {
