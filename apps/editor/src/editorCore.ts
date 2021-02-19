@@ -144,22 +144,26 @@ class ToastUIEditor {
       options
     );
 
-    this.codeBlockLanguages = [];
-    this.mode = this.options.initialEditType || 'markdown';
-
-    this.eventEmitter = new EventEmitter();
-
-    setWidgetRules(this.options.widgetRules);
-
-    const linkAttributes = sanitizeLinkAttribute(this.options.linkAttributes);
-    const { renderer, parser, plugins } = getPluginInfo(this.options.plugins);
     const {
       customHTMLRenderer,
       extendedAutolinks,
       referenceDefinition,
       frontMatter,
       customMarkdownRenderer,
+      useCommandShortcut,
+      initialEditType,
+      widgetRules,
     } = this.options;
+
+    this.codeBlockLanguages = [];
+    this.mode = initialEditType || 'markdown';
+
+    this.eventEmitter = new EventEmitter();
+
+    setWidgetRules(widgetRules);
+
+    const linkAttributes = sanitizeLinkAttribute(this.options.linkAttributes);
+    const { renderer, parser, plugins } = getPluginInfo(this.options.plugins);
     const rendererOptions = {
       linkAttributes,
       customHTMLRenderer: { ...renderer, ...customHTMLRenderer },
@@ -190,7 +194,7 @@ class ToastUIEditor {
       frontMatter,
     });
 
-    this.mdEditor = new MarkdownEditor(this.toastMark, this.eventEmitter);
+    this.mdEditor = new MarkdownEditor(this.toastMark, this.eventEmitter, useCommandShortcut);
 
     this.preview = new MarkdownPreview(this.eventEmitter, {
       ...rendererOptions,
@@ -198,7 +202,12 @@ class ToastUIEditor {
       highlight: this.options.previewHighlight,
     });
 
-    this.wwEditor = new WysiwygEditor(this.eventEmitter, wwToDOMAdaptor, linkAttributes!);
+    this.wwEditor = new WysiwygEditor(
+      this.eventEmitter,
+      wwToDOMAdaptor,
+      useCommandShortcut,
+      linkAttributes!
+    );
 
     this.convertor = new Convertor(
       this.wwEditor.getSchema(),

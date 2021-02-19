@@ -71,8 +71,8 @@ export default abstract class EditorBase {
     });
   }
 
-  createKeymaps() {
-    return this.specs.keymaps();
+  createKeymaps(useCommandShortcut: boolean) {
+    return useCommandShortcut ? this.specs.keymaps() : [];
   }
 
   createCommands() {
