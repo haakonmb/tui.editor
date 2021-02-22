@@ -45,8 +45,8 @@ class PopupWidget {
         opacity: '1',
       });
       this.popup = node;
+      view.focus();
     }
-    view.focus();
   }
 
   destroy() {
