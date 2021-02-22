@@ -4,6 +4,7 @@ import { Node as ProsemirrorNode, Slice, Fragment } from 'prosemirror-model';
 import { keymap } from 'prosemirror-keymap';
 import { baseKeymap } from 'prosemirror-commands';
 import { history } from 'prosemirror-history';
+import isNumber from 'tui-code-snippet/type/isNumber';
 
 import EditorBase, { StateOptions } from '@/base';
 import { getDefaultCommands } from '@/commands/defaultCommands';
@@ -168,7 +169,7 @@ export default class WysiwygEditor extends EditorBase {
     return this.view.state.doc;
   }
 
-  getRange(): [number, number] {
+  getSelection(): [number, number] {
     const { from, to } = this.view.state.selection;
 
     return [from, to];
@@ -178,17 +179,41 @@ export default class WysiwygEditor extends EditorBase {
     return this.view.state.schema;
   }
 
-  replaceSelection(content: string) {
+  replaceSelection(content: string, start?: number, end?: number) {
     const { schema, tr } = this.view.state;
     const { paragraph } = schema.nodes;
     const texts = content.split('\n');
     const paras = texts.map((text) => paragraph.create(null, schema.text(text)));
+    const slice = new Slice(Fragment.from(paras), 1, 1);
+    const newTr =
+      isNumber(start) && isNumber(end)
+        ? tr.replaceRange(start, end, slice)
+        : tr.replaceSelection(slice);
 
-    this.view.dispatch(tr.replaceSelection(new Slice(Fragment.from(paras), 1, 1)));
+    this.view.dispatch(newTr);
     this.focus();
   }
 
-  setModel(newDoc: ProsemirrorNode, cursorToEnd = false) {
+  deleteSelection(start?: number, end?: number) {
+    const { tr } = this.view.state;
+    const newTr =
+      isNumber(start) && isNumber(end) ? tr.deleteRange(start, end) : tr.deleteSelection();
+
+    this.view.dispatch(newTr.scrollIntoView());
+  }
+
+  getSelectedContent(start?: number, end?: number) {
+    const { doc, selection } = this.view.state;
+    let { from, to } = selection;
+
+    if (isNumber(start) && isNumber(end)) {
+      from = start;
+      to = end;
+    }
+    return doc.textBetween(from, to, '\n');
+  }
+
+  setModel(newDoc: ProsemirrorNode | [], cursorToEnd = false) {
     const { tr, doc } = this.view.state;
 
     this.view.dispatch(tr.replaceWith(0, doc.content.size, newDoc));
@@ -198,7 +223,7 @@ export default class WysiwygEditor extends EditorBase {
     }
   }
 
-  setSelection(start = 0, end = 0) {
+  setSelection(start: number, end: number) {
     const { tr } = this.view.state;
     const selection = createTextSelection(tr, start, end);
 
@@ -211,10 +236,10 @@ export default class WysiwygEditor extends EditorBase {
     dispatch(state.tr.setMeta('widget', { pos: pos ?? state.selection.to, node, style }));
   }
 
-  replaceWithWidget(from: number, to: number, content: string) {
+  replaceWithWidget(start: number, end: number, content: string) {
     const { tr, schema } = this.view.state;
     const nodes = createNodesWithWidget(content, schema);
 
-    this.view.dispatch(tr.replaceWith(from, to, nodes));
+    this.view.dispatch(tr.replaceWith(start, end, nodes));
   }
 }
