@@ -97,7 +97,7 @@ class ToastUIEditor {
 
   private mode!: EditorType;
 
-  private mdPreviewStyle!: PreviewStyle;
+  private mdPreviewStyle: PreviewStyle;
 
   private i18n: I18n;
 
@@ -157,6 +157,7 @@ class ToastUIEditor {
 
     this.codeBlockLanguages = [];
     this.mode = initialEditType || 'markdown';
+    this.mdPreviewStyle = this.options.previewStyle;
 
     this.eventEmitter = new EventEmitter();
 
@@ -288,13 +289,20 @@ class ToastUIEditor {
   }
 
   /**
-   * call commandManager's exec method
-   * @param {*} ...args Command argument
+   * execute editor command
+   * @param {string} type - editor type
+   * @param {string} name - command name
+   * @param {object} [payload] - payload for command
    */
-  exec(type: EditorType, name: string, payload: Record<string, any>) {
+  exec(type: EditorType, name: string, payload?: Record<string, any>) {
     this.commandManager.exec(type, name, payload);
   }
 
+  /**
+   * @param {string} type - editor type
+   * @param {string} name - command name
+   * @param {function} command - command handler
+   */
   addCommand(type: EditorType, name: string, command: EditorCommandFn) {
     this.commandManager.addCommand(type, name, command);
   }
@@ -367,9 +375,7 @@ class ToastUIEditor {
    * @param {string} markdown - markdown syntax text.
    * @param {boolean} [cursorToEnd=true] - move cursor to contents end
    */
-  setMarkdown(markdown: string, cursorToEnd = true) {
-    markdown = markdown ?? '';
-
+  setMarkdown(markdown = '', cursorToEnd = true) {
     this.mdEditor.setMarkdown(markdown, cursorToEnd);
 
     if (this.isWysiwygMode()) {
@@ -606,14 +612,14 @@ class ToastUIEditor {
    * Hide TUIEditor
    */
   hide() {
-    this.eventEmitter.emit('hide', this);
+    this.eventEmitter.emit('hide');
   }
 
   /**
    * Show TUIEditor
    */
   show() {
-    this.eventEmitter.emit('show', this);
+    this.eventEmitter.emit('show');
   }
 
   /**
@@ -714,7 +720,6 @@ class ToastUIEditor {
   }
 }
 
-// @TODO: remove below API
 // // (Not an official API)
 // // Create a function converting markdown to HTML using the internal parser and renderer.
 // ToastUIEditor._createMarkdownToHTML = createMarkdownToHTML;
