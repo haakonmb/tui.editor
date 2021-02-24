@@ -23,10 +23,14 @@ export function isPositionInBox(style: CSSStyleDeclaration, offsetX: number, off
   );
 }
 
-const CLS_PREFIX = 'tui-md-';
+const CLS_PREFIX = 'tui-editor-';
 
 export function cls(...names: string[]) {
   return names.map((className) => `${CLS_PREFIX}${className}`).join(' ');
+}
+
+export function clsWithMdPrefix(...names: string[]) {
+  return names.map((className) => `${CLS_PREFIX}md-${className}`).join(' ');
 }
 
 export function isTextNode(node: Node) {

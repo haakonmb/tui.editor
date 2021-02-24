@@ -14,7 +14,7 @@ import { Emitter } from '@t/event';
 import { LinkAttributes } from '@t/editor';
 import { CustomHTMLRendererMap, EditResult, MdNode, MdPos } from '@t/markdown';
 import Preview from '@/preview';
-import { toggleClass } from '@/utils/dom';
+import { cls, toggleClass } from '@/utils/dom';
 import domUtils from '@/utils/dom-legacy';
 import { getHTMLRenderConvertors } from '@/markdown/htmlRenderConvertors';
 import { sanitizeHTML } from '@/sanitizer/htmlSanitizer';
@@ -22,7 +22,7 @@ import { isInlineNode, findClosestNode, getMdStartCh } from '@/utils/markdown';
 import { findAdjacentElementToScrollTop } from './scroll/dom';
 import { removeOffsetInfoByNode } from './scroll/offset';
 
-export const CLASS_HIGHLIGHT = 'tui-editor-md-preview-highlight';
+export const CLASS_HIGHLIGHT = cls('md-preview-highlight');
 
 function findTableCell(tableRow: MdNode, chOffset: number) {
   let cell = tableRow.firstChild;
@@ -66,7 +66,7 @@ class MarkdownPreview extends Preview {
 
     super(el, eventEmitter, options.isViewer);
     this.el = el;
-    this.el.className = 'tui-editor-md-preview';
+    this.el.className = cls('md-preview');
     this.lazyRunner.registerLazyRunFunction(
       'invokeCodeBlock',
       this.invokeCodeBlockPlugins,
